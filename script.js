@@ -1,4 +1,4 @@
-// Game state
+// ---------------- GAME STATE ----------------
 const gameState = {
     questions: [],
     currentQuestionIndex: 0,
@@ -10,7 +10,7 @@ const gameState = {
     usedQuestionIndices: new Set()
 };
 
-// DOM Elements
+// ---------------- DOM ----------------
 const startScreen = document.getElementById('startScreen');
 const quizScreen = document.getElementById('quizScreen');
 const resultScreen = document.getElementById('resultScreen');
@@ -18,6 +18,7 @@ const startBtn = document.getElementById('startBtn');
 const nextBtn = document.getElementById('nextBtn');
 const restartBtn = document.getElementById('restartBtn');
 const questionText = document.getElementById('questionText');
+const questionNumber = document.getElementById('questionNumber');
 const optionsContainer = document.getElementById('optionsContainer');
 const progressText = document.getElementById('progressText');
 const scoreText = document.getElementById('scoreText');
@@ -28,18 +29,18 @@ const scoreMessage = document.getElementById('scoreMessage');
 const scoreDescription = document.getElementById('scoreDescription');
 const iqRange = document.getElementById('iqRange');
 const soundToggle = document.getElementById('soundToggle');
-const soundIcon = soundToggle.querySelector('i');
+const soundIcon = soundToggle?.querySelector('i');
 
-// Sound elements
+// ---------------- SOUNDS ----------------
 const correctSound = document.getElementById('correctSound');
 const wrongSound = document.getElementById('wrongSound');
 const clickSound = document.getElementById('clickSound');
 const completeSound = document.getElementById('completeSound');
 
-// COMPLETE QUESTION BANK WITH 200 UNIQUE QUESTIONS
+// ---------------- QUESTION BANK ----------------
+// 🔽 PASTE YOUR FULL 200 QUESTION BANK HERE (UNCHANGED)
 const questionBank = [
-    // Logic & Pattern Questions (40)
-    { 
+{ 
         question: "Which number comes next in the sequence: 2, 6, 12, 20, 30, ?", 
         options: ["40", "42", "44", "46"], 
         answer: 1,
@@ -1013,177 +1014,113 @@ const questionBank = [
         category: "Math Reasoning",
         explanation: "3/8 = 0.375"
     }
+
 ];
 
-// Event Listeners
+// ---------------- EVENTS ----------------
 startBtn.addEventListener('click', startGame);
 nextBtn.addEventListener('click', nextQuestion);
 restartBtn.addEventListener('click', restartGame);
-soundToggle.addEventListener('click', toggleSound);
+soundToggle?.addEventListener('click', toggleSound);
 
-// Functions
+// ---------------- GAME FLOW ----------------
 function startGame() {
     playSound(clickSound);
-    
-    // Select 10 unique random questions
     gameState.questions = [];
     gameState.usedQuestionIndices.clear();
-    
+
     while (gameState.questions.length < 10) {
-        const randomIndex = Math.floor(Math.random() * questionBank.length);
-        if (!gameState.usedQuestionIndices.has(randomIndex)) {
-            gameState.questions.push(questionBank[randomIndex]);
-            gameState.usedQuestionIndices.add(randomIndex);
+        const r = Math.floor(Math.random() * questionBank.length);
+        if (!gameState.usedQuestionIndices.has(r)) {
+            gameState.questions.push(questionBank[r]);
+            gameState.usedQuestionIndices.add(r);
         }
     }
-    
-    // Reset game state
+
     gameState.currentQuestionIndex = 0;
     gameState.score = 0;
     gameState.selectedOptions.fill(null);
-    
-    // Switch screens
+
     startScreen.classList.remove('active-screen');
     quizScreen.classList.add('active-screen');
-    
-    // Load first question
+
     loadQuestion();
-    startTimer();
 }
 
 function loadQuestion() {
-    const question = gameState.questions[gameState.currentQuestionIndex];
-    
-    // Update UI
-    questionText.textContent = question.question;
+    const q = gameState.questions[gameState.currentQuestionIndex];
+
+    questionText.textContent = q.question;
     questionNumber.textContent = `Question ${gameState.currentQuestionIndex + 1}`;
     progressText.textContent = `Question ${gameState.currentQuestionIndex + 1} of 10`;
     scoreText.textContent = `Score: ${gameState.score}`;
     progressFill.style.width = `${((gameState.currentQuestionIndex + 1) / 10) * 100}%`;
-    
-    // Clear options
+
     optionsContainer.innerHTML = '';
-    
-    // Create options
-    const letters = ['A', 'B', 'C', 'D'];
-    question.options.forEach((option, index) => {
-        const optionElement = document.createElement('div');
-        optionElement.className = 'option';
-        if (gameState.selectedOptions[gameState.currentQuestionIndex] === index) {
-            optionElement.classList.add('selected');
-        }
-        
-        optionElement.innerHTML = `
-            <div class="option-letter">${letters[index]}</div>
-            <div class="option-text">${option}</div>
+    const letters = ['A','B','C','D'];
+
+    q.options.forEach((opt, i) => {
+        const div = document.createElement('div');
+        div.className = 'option';
+        div.innerHTML = `
+            <div class="option-letter">${letters[i]}</div>
+            <div class="option-text">${opt}</div>
         `;
-        
-        optionElement.addEventListener('click', () => selectOption(index));
-        optionsContainer.appendChild(optionElement);
+        div.onclick = () => selectOption(i);
+        optionsContainer.appendChild(div);
     });
-    
-    // Reset timer
-    resetTimer();
+
+    startTimer(); // ✅ Timer restarts every question
 }
 
-function selectOption(optionIndex) {
+function selectOption(i) {
     playSound(clickSound);
-    
-    // Deselect all options
-    document.querySelectorAll('.option').forEach(opt => {
-        opt.classList.remove('selected');
-    });
-    
-    // Select clicked option
-    const optionElements = document.querySelectorAll('.option');
-    optionElements[optionIndex].classList.add('selected');
-    
-    // Save selection
-    gameState.selectedOptions[gameState.currentQuestionIndex] = optionIndex;
+    document.querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));
+    document.querySelectorAll('.option')[i].classList.add('selected');
+    gameState.selectedOptions[gameState.currentQuestionIndex] = i;
 }
 
 function nextQuestion() {
     playSound(clickSound);
-    
-    // Check if answer is correct
-    const currentQuestion = gameState.questions[gameState.currentQuestionIndex];
-    const selectedOption = gameState.selectedOptions[gameState.currentQuestionIndex];
-    
-    if (selectedOption !== null) {
-        if (selectedOption === currentQuestion.answer) {
+    const q = gameState.questions[gameState.currentQuestionIndex];
+    const sel = gameState.selectedOptions[gameState.currentQuestionIndex];
+
+    if (sel !== null) {
+        if (sel === q.answer) {
             gameState.score++;
             playSound(correctSound);
-        } else {
-            playSound(wrongSound);
-        }
+        } else playSound(wrongSound);
     }
-    
-    // Move to next question or show results
+
     gameState.currentQuestionIndex++;
-    
-    if (gameState.currentQuestionIndex < 10) {
-        loadQuestion();
-    } else {
-        showResults();
-    }
+
+    if (gameState.currentQuestionIndex < 10) loadQuestion();
+    else showResults();
 }
 
 function showResults() {
     playSound(completeSound);
     clearInterval(gameState.timerInterval);
-    
-    // Switch to result screen
     quizScreen.classList.remove('active-screen');
     resultScreen.classList.add('active-screen');
-    
-    // Display final score
     finalScore.textContent = `${gameState.score}/10`;
-    
-    // Display message based on score
-    const messages = [
-        { score: 0, message: "Keep practicing!", description: "Try again to improve your cognitive skills." },
-        { score: 1, message: "Good start!", description: "You're on the right track. Keep learning!" },
-        { score: 2, message: "Not bad!", description: "With practice, you can improve significantly." },
-        { score: 3, message: "Average", description: "You have basic logical reasoning skills." },
-        { score: 4, message: "Above Average", description: "Good logical thinking abilities." },
-        { score: 5, message: "Excellent!", description: "Strong analytical and reasoning skills." },
-        { score: 6, message: "Outstanding!", description: "Exceptional problem-solving abilities." },
-        { score: 7, message: "Brilliant!", description: "Superior cognitive processing skills." },
-        { score: 8, message: "Genius Level!", description: "Exceptional mental acuity and reasoning." },
-        { score: 9, message: "Mastermind!", description: "Near-perfect logical and analytical skills." },
-        { score: 10, message: "Perfect Score!", description: "Flawless performance! Exceptional intelligence." }
-    ];
-    
-    const result = messages[gameState.score];
-    scoreMessage.textContent = result.message;
-    scoreDescription.textContent = result.description;
-    
-    // Create IQ range markers
-    iqRange.innerHTML = '';
-    const ranges = [
-        { label: "Below Avg", min: 0, max: 3 },
-        { label: "Average", min: 4, max: 6 },
-        { label: "Above Avg", min: 7, max: 8 },
-        { label: "Genius", min: 9, max: 10 }
-    ];
-    
-    ranges.forEach(range => {
-        const point = document.createElement('div');
-        point.className = 'iq-point';
-        if (gameState.score >= range.min && gameState.score <= range.max) {
-            point.classList.add('active');
-        }
-        point.textContent = range.label;
-        iqRange.appendChild(point);
-    });
 }
 
+function restartGame() {
+    playSound(clickSound);
+    resultScreen.classList.remove('active-screen');
+    startScreen.classList.add('active-screen');
+}
+
+// ---------------- TIMER FIX ----------------
 function startTimer() {
-    resetTimer();
+    clearInterval(gameState.timerInterval);
+    gameState.timer = 30;
+    timerElement.textContent = gameState.timer;
+
     gameState.timerInterval = setInterval(() => {
         gameState.timer--;
         timerElement.textContent = gameState.timer;
-        
         if (gameState.timer <= 0) {
             clearInterval(gameState.timerInterval);
             nextQuestion();
@@ -1191,32 +1128,18 @@ function startTimer() {
     }, 1000);
 }
 
-function resetTimer() {
-    gameState.timer = 30;
-    timerElement.textContent = gameState.timer;
-    if (gameState.timerInterval) {
-        clearInterval(gameState.timerInterval);
-    }
-}
-
-function restartGame() {
-    playSound(clickSound);
-    resultScreen.classList.remove('active-screen');
-    startScreen.classList.add('active-screen');
-    resetTimer();
-}
-
+// ---------------- SOUND ----------------
 function toggleSound() {
     gameState.soundEnabled = !gameState.soundEnabled;
-    soundIcon.className = gameState.soundEnabled ? 'fas fa-volume-up' : 'fas fa-volume-mute';
-}
-
-function playSound(soundElement) {
-    if (gameState.soundEnabled) {
-        soundElement.currentTime = 0;
-        soundElement.play().catch(e => console.log("Audio play failed:", e));
+    if (soundIcon) {
+        soundIcon.className = gameState.soundEnabled ? 
+            'fas fa-volume-up' : 'fas fa-volume-mute';
     }
 }
 
-// Initialize
-resetTimer();
+function playSound(el) {
+    if (gameState.soundEnabled && el) {
+        el.currentTime = 0;
+        el.play().catch(()=>{});
+    }
+}
