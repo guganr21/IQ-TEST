@@ -1097,34 +1097,27 @@ function nextQuestion() {
     if (gameState.currentQuestionIndex < 10) loadQuestion();
     else showResults();
 }
-
 function showResults() {
     playSound(completeSound);
     clearInterval(gameState.timerInterval);
-    
-    // Switch to result screen
     quizScreen.classList.remove('active-screen');
     resultScreen.classList.add('active-screen');
-    
-    // Display final score
-    finalScore.textContent = `${gameState.score}/10`;
-    
-    // Display message based on score
-    const messages = [
-        { score: 0, message: "Keep practicing!", description: "Try again to improve your cognitive skills." },
-        { score: 1, message: "Good start!", description: "You're on the right track. Keep learning!" },
-        { score: 2, message: "Not bad!", description: "With practice, you can improve significantly." },
-        { score: 3, message: "Average", description: "You have basic logical reasoning skills." },
-        { score: 4, message: "Above Average", description: "Good logical thinking abilities." },
-        { score: 5, message: "Excellent!", description: "Strong analytical and reasoning skills." },
-        { score: 6, message: "Outstanding!", description: "Exceptional problem-solving abilities." },
-        { score: 7, message: "Brilliant!", description: "Superior cognitive processing skills." },
-        { score: 8, message: "Genius Level!", description: "Exceptional mental acuity and reasoning." },
-        { score: 9, message: "Mastermind!", description: "Near-perfect logical and analytical skills." },
-        { score: 10, message: "Perfect Score!", description: "Flawless performance! Exceptional intelligence." }
-];
 
-}
+    finalScore.textContent = `${gameState.score}/10`;
+
+    let iqText = "";
+
+    if (gameState.score <= 2) {
+        iqText = "IQ Range: Below 80 (Needs Improvement)";
+    } else if (gameState.score <= 4) {
+        iqText = "IQ Range: 80 – 90 (Average)";
+    } else if (gameState.score <= 6) {
+        iqText = "IQ Range: 90 – 100 (Above Average)";
+    } else if (gameState.score <= 8) {
+        iqText = "IQ Range: 100 – 115 (Smart)";
+    } else {
+        iqText = "IQ Range: 115+ (Very Intelligent)";
+    }
 
     if (iqRange) {
         iqRange.textContent = iqText;
@@ -1169,8 +1162,6 @@ function playSound(el) {
         el.play().catch(()=>{});
     }
 }
-
-
 
 
 
