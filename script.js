@@ -1097,27 +1097,28 @@ function nextQuestion() {
     if (gameState.currentQuestionIndex < 10) loadQuestion();
     else showResults();
 }
-
-
 function showResults() {
-  clearInterval(timer);
-  resultScreen.style.display = "block";
-  quizScreen.style.display = "none";
+    playSound(completeSound);
+    clearInterval(gameState.timerInterval);
+    quizScreen.classList.remove('active-screen');
+    resultScreen.classList.add('active-screen');
 
-  finalScore.innerText = score + "/10";
+    finalScore.textContent = `${gameState.score}/10`;
 
-  let iqText = "";
+    let iqText = "";
 
-  if (score <= 2) iqText = "IQ Range: Below 80";
-  else if (score <= 4) iqText = "IQ Range: 80 – 90";
-  else if (score <= 6) iqText = "IQ Range: 90 – 100";
-  else if (score <= 8) iqText = "IQ Range: 100 – 115";
-  else iqText = "IQ Range: 115+";
+    if (gameState.score <= 2) {
+        iqText = "IQ Range: Below 80 (Needs Improvement)";
+    } else if (gameState.score <= 4) {
+        iqText = "IQ Range: 80 – 90 (Average)";
+    } else if (gameState.score <= 6) {
+        iqText = "IQ Range: 90 – 100 (Above Average)";
+    } else if (gameState.score <= 8) {
+        iqText = "IQ Range: 100 – 115 (Smart)";
+    } else {
+        iqText = "IQ Range: 115+ (Very Intelligent)";
+    }
 
-  document.getElementById("iqRange").innerText = iqText;
-}
-
-   
     if (iqRange) {
         iqRange.textContent = iqText;
     }
@@ -1161,6 +1162,7 @@ function playSound(el) {
         el.play().catch(()=>{});
     }
 }
+
 
 
 
