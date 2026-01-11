@@ -1,4 +1,4 @@
-alert("JS Connected!");
+
 
 // Game state
 const gameState = {
@@ -348,4 +348,5 @@ const questionBank = [
         question: "What is 15% of 200?", 
         options: ["20", "30", "40", "50"], 
         answer: 1,
+
         category: "Math Reasoning",} ]
