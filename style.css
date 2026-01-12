@@ -335,18 +335,7 @@ h2 {
     position: relative;
 }
 
-.iq-range::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(to right, #ff0055, #ffaa00, #00ff88);
-    transform: translateY(-50%);
-    z-index: 0;
-    border-radius: 2px;
-}
+
 
 .iq-point {
     position: relative;
@@ -463,3 +452,4 @@ h2 {
         transform: translateX(-50%);
     }
 }
+
