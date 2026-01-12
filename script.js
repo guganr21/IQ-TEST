@@ -1134,7 +1134,7 @@ function restartGame() {
 // ---------------- TIMER FIX ----------------
 function startTimer() {
     clearInterval(gameState.timerInterval);
-    gameState.timer = 60;
+    gameState.timer = 20;
     timerElement.textContent = gameState.timer;
 
     gameState.timerInterval = setInterval(() => {
@@ -1162,6 +1162,7 @@ function playSound(el) {
         el.play().catch(()=>{});
     }
 }
+
 
 
 
